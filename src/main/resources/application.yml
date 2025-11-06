@@ -7,6 +7,13 @@ spring:
         completions-path: /v1beta/openai/chat/completions
         options:
           model: gemini-2.0-flash
+          temperature: 0.3  # Giảm để câu trả lời chính xác hơn
+          max-tokens: 500   # Giới hạn độ dài câu trả lời
 
 server:
   port: 8090
+
+logging:
+  level:
+    com.gahoccode: DEBUG
+
