@@ -49,7 +49,7 @@ public class ChatController {
 //        }
 //    }
 
-    @GetMapping("/vnr")
+    @PostMapping("/vnr")
     public Map<String, String> askVNR(@RequestBody Map<String, Object> request) {
         try {
             String question = (String) request.get("question");
