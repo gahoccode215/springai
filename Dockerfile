@@ -1,32 +1,16 @@
-# Build stage
-FROM maven:3.9-eclipse-temurin-21-alpine AS build
+FROM maven:3.9.6-eclipse-temurin-21 AS builder
 WORKDIR /app
+COPY . /app
+RUN mvn clean package -DskipTests
 
-# Copy pom.xml and download dependencies
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
+FROM eclipse-temurin:21-jre
+WORKDIR /usr/src/app
 
-# Copy source code and build
-COPY src ./src
-RUN mvn clean package -DskipTests -Dmaven.test.skip=true
+COPY --from=builder /app/target/spring-ai-0.0.1-SNAPSHOT.jar app.jar
+COPY .env .env
 
-# Runtime stage
-FROM eclipse-temurin:21-jre-alpine
-WORKDIR /app
 
-# Create non-root user
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
+COPY src/main/resources/MLN131_document.txt MLN131_document.txt
 
-# Copy jar from build stage
-COPY --from=build /app/target/*.jar app.jar
-
-# Expose port
-EXPOSE 8090
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8090/actuator/health || exit 1
-
-# Run application
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
