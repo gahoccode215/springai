@@ -7,7 +7,6 @@ FROM eclipse-temurin:21-jre
 WORKDIR /usr/src/app
 
 COPY --from=builder /app/target/spring-ai-0.0.1-SNAPSHOT.jar app.jar
-COPY .env .env
 
 
 COPY src/main/resources/MLN131_document.txt MLN131_document.txt
