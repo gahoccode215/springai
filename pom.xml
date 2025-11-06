@@ -45,10 +45,10 @@
         <!--            <version>1.1.0</version> &lt;!&ndash; sửa theo version bạn đang dùng &ndash;&gt;-->
         <!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-transformers-spring-boot-starter</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-transformers-spring-boot-starter</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
