@@ -21,20 +21,13 @@ public class ChatService {
     }
 
 
-//    public String askHCM(String question) throws IOException {
-//        String context = promptConfig.getDocumentForHCM();
-//        return askWithSource(question, context, "Tư tưởng Hồ Chí Minh");
-//    }
-//
-//    public String askMLN(String question) throws IOException {
-//        String context = promptConfig.getDocumentForMLN();
-//        return askWithSource(question, context, "Chủ nghĩa xã hội và khoa học");
-//    }
 
-    public String askVNR(String question) throws IOException {
-        String context = promptConfig.getDocumentForVNR();
-        return askWithSource(question, context, "Lịch sử Đảng Cộng sản Việt Nam");
+    public String askMLN(String question) throws IOException {
+        String context = promptConfig.getDocumentForMLN();
+        return askWithSource(question, context, "Chủ nghĩa xã hội và khoa học");
     }
+
+
 
 
     private String askWithSource(String question, String context, String subject) {

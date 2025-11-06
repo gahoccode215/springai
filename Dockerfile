@@ -1,32 +1,38 @@
-# Stage 1: Build
-FROM eclipse-temurin:21-jdk AS builder
+# ---------- build stage ----------
+FROM maven:3.9.6-eclipse-temurin-21 AS builder
+WORKDIR /workspace
 
-WORKDIR /app
-
-# Copy pom.xml trước để cache dependencies
+# copy pom first to leverage Docker cache for dependencies
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+# if you use a settings.xml, uncomment and copy it:
+# COPY .mvn/settings.xml /root/.m2/settings.xml
 
-# Copy toàn bộ source code
-COPY . .
+# download dependencies (optional but speeds repeated builds)
+RUN mvn -B dependency:go-offline -s /root/.m2/settings.xml || true
 
-# Build project (skip tests để nhanh)
-RUN mvn clean package -DskipTests
+# copy source and build
+COPY src ./src
+# if you use application-specific profiles, change package command accordingly
+RUN mvn -B -DskipTests package
 
-# Stage 2: Runtime (Multi-stage build - giảm size)
-FROM eclipse-temurin:21-jdk
+# find the produced fat jar (Spring Boot)
+RUN ls -lah target || true
 
+# ---------- runtime stage ----------
+FROM eclipse-temurin:21-jre
+ARG JAR_FILE
 WORKDIR /app
 
-# Copy JAR từ builder stage
-COPY --from=builder /app/target/*.jar app.jar
+# copy jar from builder; fallback to any jar in target
+COPY --from=builder /workspace/target/*.jar app.jar
 
-# Expose port
+# non-root user (optional)
+RUN useradd -m -u 1000 appuser && chown -R appuser /app
+USER appuser
+
+# Let Render provide PORT env. Default to 8080 if not set.
+ENV PORT=8080
 EXPOSE 8080
 
-# Health check (Render sẽ check)
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD java -cp app.jar org.springframework.boot.loader.JarLauncher || exit 1
-
-# Run app (Render sẽ tự set PORT từ environment variable)
-ENTRYPOINT ["sh", "-c", "java -Xmx512m -Xms256m -jar app.jar"]
+# Spring Boot reads server.port; pass it from env
+ENTRYPOINT ["sh","-c","exec java -Djava.security.egd=file:/dev/./urandom -Dserver.port=${PORT:-8080} -jar /app/app.jar"]
