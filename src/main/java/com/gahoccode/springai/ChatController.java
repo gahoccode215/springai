@@ -31,5 +31,17 @@ public class ChatController {
         }
     }
 
+    @GetMapping("/vnr202")
+    public Map<String, String> askVnr(@RequestParam String message) {
+        try {
+            String answer = chatService.askVNR202(message); // Sửa từ askMLN -> askVNR202
+            return Map.of("message", answer);
+        } catch (Exception e) {
+            log.error("Error in VNR202 Q&A: ", e);
+            return Map.of("message", "Có lỗi xảy ra khi xử lý câu hỏi");
+        }
+    }
+
+
 
 }
